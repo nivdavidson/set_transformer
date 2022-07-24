@@ -15,8 +15,8 @@ BATCH_SIZE = 64
 
 class CombinedDataset(Dataset):
     def __init__(self, signal_data, background_data, x_label, y_label):
-        self.x = signal_data[x_label] + background_data[x_label]
-        self.y = signal_data[y_label] + background_data[y_label]
+        self.x = np.concatenate([signal_data[x_label], background_data[x_label]])
+        self.y = np.concatenate([signal_data[y_label], background_data[y_label]])
 
     def __len__(self):
         return len(self.x)
