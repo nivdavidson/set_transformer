@@ -1,11 +1,32 @@
 import pickle
 import numpy as np
+import torch
+from torch.utils.data import DataLoader, TensorDataset
+
 Y_TRAIN = 'y_train'
 Y_TEST = 'y_test'
 Y_VAL = 'y_val'
 X_TRAIN = 'x_train'
 X_TEST = 'x_test'
 X_VAL = 'x_val'
+
+BATCH_SIZE = 64
+
+
+def get_dataloaders(signal_data_file_path, background_data_file_path, batch_size=BATCH_SIZE):
+    signal_data = get_data(signal_data_file_path)
+    background_data = get_data(background_data_file_path)
+
+    dataloaders = []
+    for x_key, y_key in ((X_TRAIN, Y_TRAIN),
+                         (X_VAL, Y_VAL),
+                         (X_TEST, Y_TEST)):
+        x_tensor = torch.cat([torch.Tensor(signal_data[x_key]), torch.Tensor(background_data[x_key])])
+        y_tensor = torch.cat([torch.Tensor(signal_data[y_key]), torch.Tensor(background_data[y_key])])
+        dataset = TensorDataset(x_tensor, y_tensor)
+        dataloaders.append(DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True))
+    return dataloaders
+
 
 def get_data(data_file_path, fields=["px", "py", "pz"]):
     with open(data_file_path, 'rb') as f:

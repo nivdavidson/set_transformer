@@ -6,6 +6,8 @@ import torch.nn as nn
 from torch.utils.tensorboard import SummaryWriter
 
 from modules import ISAB, PMA
+from original_data_to_sets import get_dataloaders, BATCH_SIZE
+
 
 DIM_INPUT = 10  # TODO: change default to exact number expected
 DIM_HIDDEN = 256
@@ -40,58 +42,63 @@ class SetTransformer(nn.Module):
         return self.dec(self.enc(X)).squeeze()
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--learning_rate", type=float, default=1e-3)
-parser.add_argument("--batch_size", type=int, default=64)
-parser.add_argument("--dim_input", type=int, default=DIM_INPUT)
-parser.add_argument("--dim_hidden", type=int, default=DIM_HIDDEN)
-parser.add_argument("--n_heads", type=int, default=N_HEADS)
-parser.add_argument("--n_anc", type=int, default=N_ANC)
-parser.add_argument("--train_epochs", type=int, default=2000)
-args = parser.parse_args()
-args.exp_name = f"d{args.dim}_h{args.n_heads}_i{args.n_anc}_lr{args.learning_rate}bs{args.batch_size}"
-log_dir = "result/" + args.exp_name
-model_path = log_dir + "/model"
-writer = SummaryWriter(log_dir)
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--signal_data_path", type=str)
+    parser.add_argument("--background_data_path", type=str)
+    parser.add_argument("--learning_rate", type=float, default=1e-3)
+    parser.add_argument("--batch_size", type=int, default=BATCH_SIZE)
+    parser.add_argument("--dim_input", type=int, default=DIM_INPUT)
+    parser.add_argument("--dim_hidden", type=int, default=DIM_HIDDEN)
+    parser.add_argument("--n_heads", type=int, default=N_HEADS)
+    parser.add_argument("--n_anc", type=int, default=N_ANC)
+    parser.add_argument("--train_epochs", type=int, default=2000)
+    args = parser.parse_args()
+    args.exp_name = f"d{args.dim}_h{args.n_heads}_i{args.n_anc}_lr{args.learning_rate}bs{args.batch_size}"
+    log_dir = "result/" + args.exp_name
+    model_path = log_dir + "/model"
+    writer = SummaryWriter(log_dir)
 
-# TODO: add data reader here
-data_generator = []
+    train_dataloader, val_dataloader, test_dataloader = get_dataloaders(args.signal_data_path,
+                                                                        args.background_data_path,
+                                                                        batch_size=args.batch_size)
 
-model = SetTransformer(dim_input=args.dim_input, dim_hidden=args.dim_hidden,
-                       num_heads=args.n_heads, num_inds=args.n_anc)
-optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
-criterion = nn.CrossEntropyLoss()
-model = nn.DataParallel(model)
-model = model.cuda()
+    model = SetTransformer(dim_input=args.dim_input, dim_hidden=args.dim_hidden,
+                           num_heads=args.n_heads, num_inds=args.n_anc)
+    optimizer = torch.optim.Adam(model.parameters(), lr=args.learning_rate)
+    criterion = nn.CrossEntropyLoss()
+    model = nn.DataParallel(model)
+    model = model.cuda()
 
-for epoch in range(args.train_epochs):
-    model.train()
-    losses, total, correct = [], 0, 0
-    for x, y in data_generator.train_data():
-        x = torch.Tensor(x).cuda()
-        y = torch.Tensor(y).cuda()
-        preds = model(x)
-        loss = criterion(preds, y)
+    ### Train ###
+    for epoch in range(args.train_epochs):
+        model.train()
+        losses, total, correct = [], 0, 0
+        for x, y in train_dataloader:
+            x = torch.Tensor(x).cuda()
+            y = torch.Tensor(y).cuda()
+            preds = model(x)
+            loss = criterion(preds, y)
 
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-        losses.append(loss.item())
-        total += y.shape[0]
-        correct += (preds.argmax(dim=1) == y).sum().item()
+            losses.append(loss.item())
+            total += y.shape[0]
+            correct += (preds.argmax(dim=1) == y).sum().item()
 
-    avg_loss, avg_acc = np.mean(losses), correct / total
-    writer.add_scalar("train_loss", avg_loss)
-    writer.add_scalar("train_acc", avg_acc)
-    print(f"Epoch {epoch}: train loss {avg_loss:.3f} train acc {avg_acc:.3f}")
+        avg_loss, avg_acc = np.mean(losses), correct / total
+        writer.add_scalar("train_loss", avg_loss)
+        writer.add_scalar("train_acc", avg_acc)
+        print(f"Epoch {epoch}: train loss {avg_loss:.3f} train acc {avg_acc:.3f}")
 
-    if epoch % 10 == 0:
+        ### Test
         model.eval()
         losses, total, correct = [], 0, 0
-        for x, _, y in generator.test_data():
+        for x, y in test_dataloader:
             x = torch.Tensor(x).cuda()
-            y = torch.Tensor(y).long().cuda()
+            y = torch.Tensor(y).cuda()
             preds = model(x)
             loss = criterion(preds, y)
 
@@ -101,4 +108,4 @@ for epoch in range(args.train_epochs):
         avg_loss, avg_acc = np.mean(losses), correct / total
         writer.add_scalar("test_loss", avg_loss)
         writer.add_scalar("test_acc", avg_acc)
-        print(f"Epoch {epoch}: test loss {avg_loss:.3f} test acc {avg_acc:.3f}")
+        print(f"Result: test loss {avg_loss:.3f} test acc {avg_acc:.3f}")
