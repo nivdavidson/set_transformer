@@ -62,7 +62,7 @@ def get_data(data_file_path, fields=["px", "py", "pz"]):
                     new_track.append(track[track_fields.index(field)])
                 # GammaID, BtagID
                 new_track.extend([0, 0])
-                new_event.append(np.array(new_track, dtype=float))
+                new_event.append(np.array(new_track, dtype=np.float))
             for gamma in event['gamma']:
                 new_gamma = []
                 for field in fields:
@@ -80,5 +80,5 @@ def get_data(data_file_path, fields=["px", "py", "pz"]):
                 new_btag.extend([0, 1])
                 new_event.append(np.array(new_btag, dtype=np.float))
             new_vals.append(new_event)
-        formatted_data[label] = np.array(new_vals, dtype=object)
+        formatted_data[label] = np.array(new_vals, dtype=np.float)
     return formatted_data
