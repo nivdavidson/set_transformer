@@ -54,7 +54,7 @@ if __name__ == '__main__':
     parser.add_argument("--n_anc", type=int, default=N_ANC)
     parser.add_argument("--train_epochs", type=int, default=2000)
     args = parser.parse_args()
-    args.exp_name = f"d{args.dim}_h{args.n_heads}_i{args.n_anc}_lr{args.learning_rate}bs{args.batch_size}"
+    args.exp_name = f"d{args.dim_input}_h{args.n_heads}_i{args.n_anc}_lr{args.learning_rate}_bs{args.batch_size}"
     log_dir = "result/" + args.exp_name
     model_path = log_dir + "/model"
     writer = SummaryWriter(log_dir)
