@@ -75,8 +75,8 @@ if __name__ == '__main__':
         model.train()
         losses, total, correct = [], 0, 0
         for x, y in train_dataloader:
-            x = torch.Tensor(x).cuda()
-            y = torch.Tensor(y).cuda()
+            x = torch.stack(x).cuda()
+            y = torch.FloatTensor(y).cuda()
             preds = model(x)
             loss = criterion(preds, y)
 
@@ -97,8 +97,8 @@ if __name__ == '__main__':
         model.eval()
         losses, total, correct = [], 0, 0
         for x, y in test_dataloader:
-            x = torch.Tensor(x).cuda()
-            y = torch.Tensor(y).cuda()
+            x = torch.stack(x).cuda()
+            y = torch.FloatTensor(y).cuda()
             preds = model(x)
             loss = criterion(preds, y)
 

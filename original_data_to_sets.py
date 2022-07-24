@@ -72,7 +72,7 @@ def get_data(data_file_path, fields=("px", "py", "pz")):
                     new_track.append(track[track_fields.index(field)])
                 # GammaID, BtagID
                 new_track.extend([0, 0])
-                new_event.append(np.array(new_track, dtype=np.float))
+                new_event.append(np.array(new_track, dtype=np.double))
             for gamma in event['gamma']:
                 new_gamma = []
                 for field in fields:
@@ -80,7 +80,7 @@ def get_data(data_file_path, fields=("px", "py", "pz")):
                 new_gamma.extend([0 for i in range(len(particle_id_fields))])
                 # GammaID, BtagID
                 new_gamma.extend([1, 0])
-                new_event.append(np.array(new_gamma, dtype=np.float))
+                new_event.append(np.array(new_gamma, dtype=np.double))
             for btag in event['Btag']:
                 new_btag = []
                 for field in fields:
@@ -88,7 +88,7 @@ def get_data(data_file_path, fields=("px", "py", "pz")):
                 new_btag.extend([0 for i in range(len(particle_id_fields))])
                 # GammaID, BtagID
                 new_btag.extend([0, 1])
-                new_event.append(np.array(new_btag, dtype=np.float))
+                new_event.append(np.array(new_btag, dtype=np.double))
             new_vals.append(new_event)
         formatted_data[label] = new_vals
     return formatted_data
