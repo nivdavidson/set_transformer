@@ -85,7 +85,7 @@ if __name__ == '__main__':
                 x[i] = torch.cat((event, torch.zeros(max_num_particles - event.shape[0], event.shape[1])))
 
             x = torch.stack(x).float().cuda()
-            y = torch.stack(y).long().cuda()
+            y = torch.Tensor(y).long().cuda()
             preds = model(x)
             preds = preds.reshape(len(y), len(preds))
             loss = criterion(preds, y)
