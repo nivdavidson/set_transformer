@@ -36,7 +36,7 @@ def get_dataloaders(signal_data_file_path, background_data_file_path, batch_size
         dataset = CombinedDataset(signal_data, background_data, x_key, y_key)
         dataloaders.append(DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True,
                                       collate_fn=lambda batch: ([torch.from_numpy(batch[i][0]) for i in range(len(batch))],
-                                                                [torch.from_numpy(batch[i][1]) for i in range(len(batch))])))
+                                                                [batch[i][1] for i in range(len(batch))])))
     return dataloaders
 
 
