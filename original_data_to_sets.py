@@ -62,13 +62,13 @@ def get_data(data_file_path, fields=("px", "py", "pz")):
 
     for label in [X_TRAIN, X_TEST, X_VAL]:
         x_vals = data[label]
-        ### padding ###
-        max_events = 0
-        for event in x_vals:
-            if len(event['track']) + len(event['gamma']) > max_events:
-                max_events = len(event['track']) + len(event['gamma'])
-        max_events = max_events + 1
-        ### end of padding ###
+        # ### padding ###
+        # max_events = 0
+        # for event in x_vals:
+        #     if len(event['track']) + len(event['gamma']) > max_events:
+        #         max_events = len(event['track']) + len(event['gamma'])
+        # max_events = max_events + 1
+        # ### end of padding ###
         new_vals= []
         for event in x_vals:
             new_event = []
@@ -97,12 +97,12 @@ def get_data(data_file_path, fields=("px", "py", "pz")):
                 # GammaID, BtagID
                 new_btag.extend([0, 1])
                 new_event.append(np.array(new_btag, dtype=np.double))
-            ### padding ###
-            add_num_of_events = max_events - len(new_event)
-            for i in range(add_num_of_events):
-                new_event.append(np.array(
-                    [0 for i in range(len(particle_id_fields) + 2 + len(fields))], dtype=np.double))
-            ### end of padding ###
+            # ### padding ###
+            # add_num_of_events = max_events - len(new_event)
+            # for i in range(add_num_of_events):
+            #     new_event.append(np.array(
+            #         [0 for i in range(len(particle_id_fields) + 2 + len(fields))], dtype=np.double))
+            # ### end of padding ###
             new_vals.append(np.vstack(new_event))
         formatted_data[label] = new_vals
     return formatted_data
