@@ -76,14 +76,16 @@ if __name__ == '__main__':
         s = time.time()
         model.train()
         losses, total, correct = [], 0, 0
-        for x, y in train_dataloader:
+        for batch in train_dataloader:
+            print('batch:', len(batch), batch)
+            x, y = batch
             # Pad with zeroes
             max_num_particles = max([event.shape[0] for event in x])
             for i, event in enumerate(x):
                 x[i] = torch.cat((event, torch.zeros(max_num_particles - event.shape[0], event.shape[1])))
 
             x = torch.stack(x).float().cuda()
-            y = y.long().cuda()
+            y = torch.stack(y).long().cuda()
             preds = model(x)
             preds = preds.reshape(len(y), len(preds))
             loss = criterion(preds, y)
