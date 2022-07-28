@@ -72,7 +72,6 @@ if __name__ == '__main__':
 
     ### Train ###
     for epoch in range(args.train_epochs):
-        print(f"Epoch: {epoch+1}/{args.train_epochs}", end='')
         model.train()
         losses, total, correct = [], 0, 0
         for x, y in train_dataloader:
@@ -95,19 +94,19 @@ if __name__ == '__main__':
         writer.add_scalar("train_acc", avg_acc)
         print(f"Epoch {epoch+1}/{args.train_epochs}: train loss {avg_loss:.3f} train acc {avg_acc:.3f}")
 
-        ### Test
-        model.eval()
-        losses, total, correct = [], 0, 0
-        for x, y in test_dataloader:
-            x = torch.stack(x).double().cuda()
-            y = torch.DoubleTensor(y).cuda()
-            preds = model(x)
-            loss = criterion(preds, y)
+    ### Test
+    model.eval()
+    losses, total, correct = [], 0, 0
+    for x, y in test_dataloader:
+        x = torch.stack(x).double().cuda()
+        y = torch.DoubleTensor(y).cuda()
+        preds = model(x)
+        loss = criterion(preds, y)
 
-            losses.append(loss.item())
-            total += y.shape[0]
-            correct += (preds.argmax(dim=1) == y).sum().item()
-        avg_loss, avg_acc = np.mean(losses), correct / total
-        writer.add_scalar("test_loss", avg_loss)
-        writer.add_scalar("test_acc", avg_acc)
-        print(f"Result: test loss {avg_loss:.3f} test acc {avg_acc:.3f}")
+        losses.append(loss.item())
+        total += y.shape[0]
+        correct += (preds.argmax(dim=1) == y).sum().item()
+    avg_loss, avg_acc = np.mean(losses), correct / total
+    writer.add_scalar("test_loss", avg_loss)
+    writer.add_scalar("test_acc", avg_acc)
+    print(f"Result: test loss {avg_loss:.3f} test acc {avg_acc:.3f}")
