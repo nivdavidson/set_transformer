@@ -35,7 +35,7 @@ def get_dataloaders(signal_data_file_path, background_data_file_path, batch_size
                          (X_TEST, Y_TEST)):
         dataset = CombinedDataset(signal_data, background_data, x_key, y_key)
         dataloaders.append(DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True,
-                                      collate_fn=lambda batch: batch))
+                                      collate_fn=lambda batch: list(batch)))
     return dataloaders
 
 
