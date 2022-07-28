@@ -76,9 +76,7 @@ if __name__ == '__main__':
         s = time.time()
         model.train()
         losses, total, correct = [], 0, 0
-        for batch in train_dataloader:
-            print('batch:', len(batch), batch)
-            x, y = batch
+        for x, y in train_dataloader:
             # Pad with zeroes
             max_num_particles = max([event.shape[0] for event in x])
             for i, event in enumerate(x):
