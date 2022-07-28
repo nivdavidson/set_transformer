@@ -43,6 +43,16 @@ class SetTransformer(nn.Module):
         return self.dec(self.enc(X)).squeeze()
 
 
+def pad_and_cast(x, y):
+    # Pad with zeroes
+    max_num_particles = max([event.shape[0] for event in x])
+    for i, event in enumerate(x):
+        x[i] = torch.cat((event, torch.zeros(max_num_particles - event.shape[0], event.shape[1])))
+    x = torch.stack(x).float().cuda()
+    y = torch.Tensor(y).long().cuda()
+    return x, y
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--signal_data_path", type=str)
@@ -77,13 +87,7 @@ if __name__ == '__main__':
         model.train()
         losses, total, correct = [], 0, 0
         for x, y in train_dataloader:
-            # Pad with zeroes
-            max_num_particles = max([event.shape[0] for event in x])
-            for i, event in enumerate(x):
-                x[i] = torch.cat((event, torch.zeros(max_num_particles - event.shape[0], event.shape[1])))
-
-            x = torch.stack(x).float().cuda()
-            y = torch.Tensor(y).long().cuda()
+            x, y = pad_and_cast(x, y)
             preds = model(x)
             loss = criterion(preds, y)
 
@@ -104,8 +108,7 @@ if __name__ == '__main__':
     model.eval()
     losses, total, correct = [], 0, 0
     for x, y in test_dataloader:
-        x = torch.stack(x).double().cuda()
-        y = torch.DoubleTensor(y).cuda()
+        x, y = pad_and_cast(x, y)
         preds = model(x)
         loss = criterion(preds, y)
 
