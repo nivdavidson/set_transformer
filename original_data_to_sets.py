@@ -97,7 +97,8 @@ def get_data(data_file_path, fields=("px", "py", "pz")):
                 new_btag.extend([0, 1])
                 new_event.append(np.array(new_btag, dtype=np.double))
             ### padding ###
-            for i in range(max_events - len(new_event)):
+            add_num_of_events = max_events - len(new_event)
+            for i in range(add_num_of_events):
                 new_event.append(np.array(
                     [0 for i in range(len(particle_id_fields) + 2 + len(fields))], dtype=np.double))
             ### end of padding ###
