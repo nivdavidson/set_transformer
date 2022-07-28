@@ -72,12 +72,14 @@ if __name__ == '__main__':
 
     ### Train ###
     for epoch in range(args.train_epochs):
+        print(f"Epoch: {epoch+1}/{args.train_epochs}", end='')
         model.train()
         losses, total, correct = [], 0, 0
         for x, y in train_dataloader:
-            x = torch.stack(x).cuda()
-            y = torch.FloatTensor(y).cuda()
+            x = x.float().cuda()
+            y = y.long().cuda()
             preds = model(x)
+            preds = preds.reshape(1, len(preds))
             loss = criterion(preds, y)
 
             optimizer.zero_grad()
@@ -91,14 +93,14 @@ if __name__ == '__main__':
         avg_loss, avg_acc = np.mean(losses), correct / total
         writer.add_scalar("train_loss", avg_loss)
         writer.add_scalar("train_acc", avg_acc)
-        print(f"Epoch {epoch}: train loss {avg_loss:.3f} train acc {avg_acc:.3f}")
+        print(f"Epoch {epoch+1}/{args.train_epochs}: train loss {avg_loss:.3f} train acc {avg_acc:.3f}")
 
         ### Test
         model.eval()
         losses, total, correct = [], 0, 0
         for x, y in test_dataloader:
-            x = torch.stack(x).cuda()
-            y = torch.FloatTensor(y).cuda()
+            x = torch.stack(x).double().cuda()
+            y = torch.DoubleTensor(y).cuda()
             preds = model(x)
             loss = criterion(preds, y)
 

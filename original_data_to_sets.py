@@ -15,7 +15,7 @@ BATCH_SIZE = 64
 
 class CombinedDataset(Dataset):
     def __init__(self, signal_data, background_data, x_label, y_label):
-        self.x = np.concatenate([signal_data[x_label], background_data[x_label]])
+        self.x = signal_data[x_label] + background_data[x_label]
         self.y = np.concatenate([signal_data[y_label], background_data[y_label]])
 
     def __len__(self):
@@ -89,6 +89,6 @@ def get_data(data_file_path, fields=("px", "py", "pz")):
                 # GammaID, BtagID
                 new_btag.extend([0, 1])
                 new_event.append(np.array(new_btag, dtype=np.double))
-            new_vals.append(new_event)
+            new_vals.append(np.vstack(new_event))
         formatted_data[label] = new_vals
     return formatted_data
