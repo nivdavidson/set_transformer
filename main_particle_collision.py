@@ -98,7 +98,7 @@ if __name__ == '__main__':
         avg_loss, avg_acc = np.mean(losses), correct / total
         writer.add_scalar("train_loss", avg_loss)
         writer.add_scalar("train_acc", avg_acc)
-        print(f"Epoch {epoch+1}/{args.train_epochs} (took {time.time()-s}s): train loss {avg_loss:.3f} train acc {avg_acc:.3f}")
+        print(f"Epoch {epoch+1}/{args.train_epochs} (took {time.time()-s:.2f}s): train loss {avg_loss:.3f} train acc {avg_acc:.3f}")
 
     ### Test
     model.eval()
