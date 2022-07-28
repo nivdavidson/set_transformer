@@ -85,7 +85,6 @@ if __name__ == '__main__':
             x = torch.stack(x).float().cuda()
             y = torch.Tensor(y).long().cuda()
             preds = model(x)
-            preds = preds.reshape(len(y), len(preds))
             loss = criterion(preds, y)
 
             optimizer.zero_grad()
