@@ -61,6 +61,15 @@ python main_pointcloud.py --batch_size 256 --num_pts 5000
 The hyperparameters here were minimally tuned yet reproduced the results in the paper.
 It is likely that further tuning will get better results.
 
+
+### Particle Collision
+We used data generated from a Monte Carlo simulation of the Belle II experiment.
+
+To run the particle collision experiment, run
+```
+python3 main_particle_collision.py --signal_data_path <signal_data_path> --background_data_path <background_data_path> 
+```
+
 ## Reference
 
 If you found the provided code useful, please consider citing our work.
